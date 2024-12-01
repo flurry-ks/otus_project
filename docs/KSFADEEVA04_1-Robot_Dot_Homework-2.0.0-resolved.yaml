@@ -1,0 +1,160 @@
+openapi: 3.0.0
+info:
+  title: Robot and dot
+  description: API для заказа блюд через приложение
+  version: 2.0.0
+servers:
+- url: https://virtserver.swaggerhub.com/KSFADEEVA04_1/Robot_Dot_Homework/2.0.0
+  description: SwaggerHub API Auto Mocking
+paths:
+  /order/{order_id}/status:
+    get:
+      tags:
+      - Просмотр данных заказа
+      summary: Получение статуса заказа
+      description: Возращает статус оформленного заказа
+      parameters:
+      - name: order_id
+        in: path
+        description: ID заказа
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Статус заказа
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderStatus'
+        "401":
+          description: Пользователь не авторизован
+        "404":
+          description: Заказ не найден
+        "500":
+          description: Внутренняя ошибка сервера
+      security:
+      - bearerAuth: []
+  /user/{user_id}/orders:
+    get:
+      tags:
+      - Просмотр данных заказа
+      summary: Получение списка заказов
+      description: Возвращает список заказов авторизованного пользователя
+      parameters:
+      - name: user_id
+        in: path
+        description: ID пользователя
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: ОК
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+        "401":
+          description: Пользователь не авторизован
+        "404":
+          description: Пользователь не найден
+        "500":
+          description: Внутренняя ошибка сервера
+      security:
+      - bearerAuth: []
+  /dish/review:
+    post:
+      tags:
+      - Отзывы
+      summary: Добавление отзыва о блюде
+      description: Добавляет отзыв о выбранном блюде
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Review'
+        required: true
+      responses:
+        "201":
+          description: Отзыв добавлен
+        "400":
+          description: Неверный запрос
+        "401":
+          description: Пользователь не авторизован
+        "404":
+          description: Блюдо не найдено
+        "500":
+          description: Внутренняя ошибка сервера
+components:
+  schemas:
+    OrderStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Статус заказа
+          enum:
+          - отменен
+          - в процессе
+          - оплачен
+          - в работе
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID заказа
+        date:
+          type: string
+          description: Дата оформления заказа
+          format: date
+        price:
+          type: number
+        dish:
+          type: array
+          description: список блюд в заказе
+          items:
+            $ref: '#/components/schemas/Dish'
+    Dish:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        imageLink:
+          type: string
+          format: url
+          example: https://static.wikia.nocookie.net/harrypotter/images/c/c5/Pumpkin_Juice_WWHP.jpg/revision/latest/scale-to-width-down/1000?cb=20110529053444
+    Review:
+      required:
+      - dish_id
+      - rating
+      type: object
+      properties:
+        dish_id:
+          type: string
+          description: ID блюда
+        rating:
+          maximum: 5
+          minimum: 1
+          type: integer
+          description: Рейтинг блюда
+        text:
+          type: string
+          description: Текст отзыва
+        user_id:
+          type: string
+          description: "Идентификатор пользователя, оставившего отзыв"
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
