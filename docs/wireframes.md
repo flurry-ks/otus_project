@@ -7,8 +7,11 @@
 ## Меню (главный экран приложения)
 <img src="/docs/assets/Menu.png" width="300">
 
-## Корзина
+## Детальная инфрмация о товаре
 <img src="/docs/assets/Card.png" width="300">
+
+## Корзина
+<img src="/docs/assets/Basket.png" width="300">
 
 ## Оформление заказа
 <img src="/docs/assets/Order.png" width="300">
