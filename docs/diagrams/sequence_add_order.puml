@@ -1,0 +1,77 @@
+@startuml
+title Диаграмма последовательности: Оформление заказа с оплатой
+
+actor Клиент as User
+
+participant "Мобильное приложение" as MobileApp
+participant "Сервис Управления заказами" as OrderService
+participant "Платежный сервис" as PaymentService
+participant "Сервис Управления ассортиментом" as MenuService
+database "База данных" as DB
+
+== Работа с меню ==
+User -> MobileApp: Просмотреть меню
+MobileApp -> MenuService: Запросить список блюд (GET /dishes)
+MenuService -> DB: Получить список блюд
+DB --> MenuService: Список блюд
+MenuService --> MobileApp: Список блюд
+
+alt Ошибка получения списка блюд
+    MenuService --> MobileApp: Ошибка загрузки меню
+end
+
+== Добавление позиций в корзину ==
+User -> MobileApp: Добавить блюдо в корзину
+MobileApp -> OrderService: Добавить позицию (POST /carts/items)
+OrderService -> DB: Сохранить позицию в корзине
+DB --> OrderService: Позиция сохранена
+OrderService --> MobileApp: Позиция добавлена
+
+alt Ошибка сохранения позиции
+    OrderService --> MobileApp: Ошибка добавления позиции
+end
+
+== Оформление заказа ==
+User -> MobileApp: Оформить заказ
+MobileApp -> OrderService: Оформить заказ (POST /orders)
+OrderService -> DB: Создать запись заказа
+DB --> OrderService: Заказ создан
+OrderService --> MobileApp: Подтверждение заказа
+
+== Оплата заказа ==
+MobileApp -> PaymentService: Выполнить оплату (POST /orders/payment)
+
+alt Оплата успешна
+    PaymentService --> MobileApp: Подтверждение оплаты
+    MobileApp -> OrderService: Обновить статус заказа (PATCH /orders/{order_id}/status)
+    OrderService -> DB: Обновить статус на "Оплачено"
+    DB --> OrderService: Обновление успешно
+    OrderService --> MobileApp: Статус обновлен
+end
+
+alt Ошибка оплаты
+    PaymentService --> MobileApp: Ошибка оплаты
+    loop Попытка повторной оплаты
+        User -> MobileApp: Повторить оплату
+        MobileApp -> PaymentService: Выполнить оплату (POST /orders/payment)
+        alt Оплата успешна
+            PaymentService --> MobileApp: Подтверждение оплаты
+            MobileApp -> OrderService: Обновить статус заказа (PATCH /orders/{order_id}/status)
+            OrderService -> DB: Обновить статус на "Оплачено"
+            DB --> OrderService: Обновление успешно
+            OrderService --> MobileApp: Статус обновлен
+            break
+        end
+        alt Повторная ошибка оплаты
+            PaymentService --> MobileApp: Ошибка оплаты
+        end
+    end
+end
+
+== Альтернативные сценарии ==
+alt Ошибка базы данных при сохранении заказа
+    DB --> OrderService: Ошибка сохранения
+    OrderService --> MobileApp: Сообщение об ошибке
+end
+
+@enduml
