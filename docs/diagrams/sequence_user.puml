@@ -1,0 +1,36 @@
+@startuml
+title Диаграмма последовательности: Получение данных пользователя и возможность их изменения
+
+actor Клиент as User
+participant "Мобильное приложение" as MobileApp
+participant "Сервис пользователей" as UserService
+database "База данных" as DB
+
+== Получение данных пользователя ==
+User -> MobileApp: Запросить данные пользователя
+MobileApp -> UserService: Получить данные пользователя (GET /users/{user_id})
+UserService -> DB: Получить информацию о пользователе
+DB --> UserService: Информация о пользователе
+UserService --> MobileApp: Данные пользователя
+MobileApp --> User: Данные пользователя
+
+alt Ошибка: Не авторизован
+    UserService --> MobileApp: Ошибка: Пользователь не авторизован
+    MobileApp --> User: Требуется авторизация
+end
+
+== Опционально: Изменение данных пользователя ==
+opt Изменить данные пользователя
+    User -> MobileApp: Изменить данные (например, имя, телефон)
+    MobileApp -> UserService: Обновить данные пользователя (PATCH /users/{user_id})
+    UserService -> DB: Обновить данные пользователя
+    DB --> UserService: Данные обновлены
+    UserService --> MobileApp: Подтверждение обновления
+    MobileApp --> User: Данные успешно обновлены
+alt Ошибка при обновлении данных
+    UserService --> MobileApp: Ошибка обновления данных
+    MobileApp --> User: Не удалось обновить данные
+end
+end
+
+@enduml
