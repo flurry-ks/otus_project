@@ -1,0 +1,36 @@
+@startuml
+title Диаграмма последовательности: Получение активных заказов для табло с обновлениями от сервера
+
+actor "Табло" as Display
+participant "Сервис Управления заказами" as OrderService
+database "База данных" as DB
+
+== Инициализация связи с табло ==
+Display -> OrderService: Подключиться для получения активных заказов (WebSocket / Push)
+OrderService -> Display: Уведомление о подключении
+
+== Получение активных заказов ==
+OrderService -> DB: Получить список активных заказов
+DB --> OrderService: Список активных заказов
+OrderService --> Display: Активные заказы (начальная загрузка)
+
+== Обновление активных заказов на сервере ==
+OrderService -> Display: Уведомление о новом или измененном заказе (Push / WebSocket)
+
+alt Новый заказ
+    OrderService -> DB: Создать новый заказ
+    DB --> OrderService: Новый заказ сохранен
+    OrderService -> Display: Уведомление о новом заказе
+end
+
+alt Изменение статуса заказа
+    OrderService -> DB: Обновить статус заказа
+    DB --> OrderService: Статус обновлен
+    OrderService -> Display: Уведомление об изменении статуса заказа
+end
+
+alt Ошибка получения данных
+    OrderService --> Display: Ошибка получения актуальных данных
+end
+
+@enduml
