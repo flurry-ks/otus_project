@@ -1,0 +1,24 @@
+@startuml
+title Диаграмма последовательности: Регистрация пользователя
+
+actor Клиент as User
+participant "Мобильное приложение" as MobileApp
+participant "Сервис аутентификации" as AuthService
+database "База данных" as DB
+
+== Регистрация пользователя ==
+User -> MobileApp: Ввести данные для регистрации (логин, пароль)
+MobileApp -> AuthService: Регистрация (POST /auth/register)
+AuthService -> DB: Сохранить нового пользователя
+
+alt Регистрация успешна
+    DB --> AuthService: Пользователь создан
+    AuthService --> MobileApp: Успешная регистрация
+    MobileApp --> User: Учетная запись создана
+else Ошибка регистрации
+    DB --> AuthService: Ошибка сохранения
+    AuthService --> MobileApp: Сообщение об ошибке
+    MobileApp --> User: Регистрация не удалась
+end
+
+@enduml
