@@ -1,5 +1,6 @@
 # Пользовательский интерфейс приложения
-[Ссылка на кликабельный прототип](https://www.figma.com/proto/FKHMCgL9QfOi481PzamahS/Robot-and-dot?node-id=2238-4869&node-type=canvas&t=0JAcs8YhykxZhnEq-0&scaling=scale-down&content-scaling=fixed&page-id=2202%3A6005)
+- [Ссылка на кликабельный прототип](https://www.figma.com/proto/FKHMCgL9QfOi481PzamahS/Robot-and-dot?node-id=2238-4869&node-type=canvas&t=0JAcs8YhykxZhnEq-0&scaling=scale-down&content-scaling=fixed&page-id=2202%3A6005)
+- [Ссылка на макеты в Figma](https://www.figma.com/design/FKHMCgL9QfOi481PzamahS/Robot-and-dot?node-id=2202-6005&t=YkKwNV5jrdlvNCGX-1)
 
 ## Авторизация и регистрация в приложении
 <img src="/docs/assets/Sign_in.png" width="300">
